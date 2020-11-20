@@ -140,7 +140,8 @@ App({
     })
   },
   globalData: {
-    urlConfig:"http://localhost:8787/clockin",//接口路径
+    // urlConfig:"http://localhost:8787/clockin",
+    urlConfig:"https://www.qoiop.cn/clockin",
     userInfo: null,
     infoflag:0, //0未授权  1已授权
     openid:"",
