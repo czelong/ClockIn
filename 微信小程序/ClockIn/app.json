@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/clock/index/index",
+    "pages/mine/index/index",
+    "pages/mine/record/record",
+    "pages/mine/rank/rank",
+    "pages/mine/register/register",
+    "pages/index/index"
+  ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于打卡时的定位" 
+    }
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "IOT-LAB",
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "white",
+    "enablePullDownRefresh": false
+  },
+  "usingComponents": {
+    "cu-custom": "/colorui/components/cu-custom"
+  },
+  "sitemapLocation": "sitemap.json",
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#1296db",
+    "backgroundColor": "#fafafa",
+    "list": [
+      {
+        "pagePath": "pages/clock/index/index",
+        "text": "打卡",
+        "iconPath": "icons/clock.png",
+        "selectedIconPath": "icons/clock_select.png"
+      },
+      {
+        "pagePath": "pages/mine/index/index",
+        "text": "我的",
+        "iconPath": "icons/mine.png",
+        "selectedIconPath": "icons/mine_select.png"
+      }
+    ]
+  }
+}

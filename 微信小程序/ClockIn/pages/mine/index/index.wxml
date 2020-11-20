@@ -1,0 +1,35 @@
+<cu-custom bgColor="bg-blue">
+  <view slot="content">我的</view>
+</cu-custom>
+<view class="bg-blue" style="width:750rpx;height:220rpx;">
+  <view class="user flex align-center" style="padding-top:30rpx;padding-left:20rpx;">
+    <view class="cu-avatar xl round margin-left" style="background-image:url({{portrait}});"></view>
+    <view class="name" style="margin-left:80rpx;">
+      <text class="text-xl line">{{name}}</text>
+    </view>
+    <text class="text-lg text-red margin-left" bindtap="jump" data-location="register" wx:if="{{state == -1}}">未认证</text>
+    <text class="text-lg text-red margin-left" wx:if="{{state == 0}}">审核中</text>
+  </view>
+</view>
+<view class="cu-list menu sm-border card-menu" style="margin-top:-20rpx;">
+  <view class="cu-item arrow">
+    <view class="content" bindtap="jump" data-location="record">
+      <image src="../../../icons/record.png" mode="aspectFit"></image>
+      <text class="text-grey margin-left">打卡记录</text>
+    </view>
+  </view>
+  <view class="cu-item arrow">
+    <view class="content" bindtap="jump" data-location="rank">
+      <image src="../../../icons/rank.png" mode="aspectFit"></image>
+      <text class="text-grey margin-left">历史排行</text>
+    </view>
+  </view>
+</view>
+
+<view class="cu-modal bottom-modal {{ infoflag == 0 ?'show':''}}">
+  <view class="cu-dialog">
+    <view class="padding-xl">
+      <button class="cu-btn bg-blue round lg" open-type="getUserInfo" bindgetuserinfo="bindgetUserInfo">获取微信头像和昵称权限</button>
+    </view>
+  </view>
+</view>

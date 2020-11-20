@@ -1,0 +1,34 @@
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+  <view slot="backText">返回</view>
+  <view slot="content">成员认证</view>
+</cu-custom>
+
+<view class="card bg-white">
+  <view>
+    <view class="flex margin justify-center">
+      <form class="form">
+        <view class="form-item text-xl">
+          <text class="item-title text-black text-bold">班级</text>
+          <input class="item-input" name="class" placeholder="请输入您的班级" bindinput="setClass"></input>
+        </view>
+        <view class="form-item text-xl">
+          <text class="item-title text-black text-bold">姓名</text>
+          <view class="flex">
+            <input name="name" class="item-input" placeholder="请输入您的姓名" bindinput="setName"></input>
+          </view>
+        </view>
+      </form>
+    </view>
+    <view class="flex justify-center btn margin-top">
+      <button class="cu-btn lg round bg-gradual-blue" style="width:580rpx;height:80rpx;" bindtap="register">提交申请</button>
+    </view>
+  </view>
+</view>
+
+<view class="cu-modal bottom-modal {{ infoflag == 0 ?'show':''}}">
+  <view class="cu-dialog">
+    <view class="padding-xl">
+      <button class="cu-btn bg-blue round lg" open-type="getUserInfo" bindgetuserinfo="bindgetUserInfo">获取微信头像和昵称权限</button>
+    </view>
+  </view>
+</view>

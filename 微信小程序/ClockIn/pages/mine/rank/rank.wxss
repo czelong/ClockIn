@@ -1,0 +1,30 @@
+/* pages/mine/rank/rank.wxss */
+page{
+  background-color: white;
+}
+.img-view{
+  width: 100%;
+  height: 500rpx;
+}
+.img{
+  width: 100%;
+  height: 100%;
+}
+.ranks{
+  margin-top: 30rpx;
+  width: 100%;
+}
+.rank{
+  height: 100rpx;
+  padding:20rpx;
+  padding-left: 30rpx;
+}
+.num{
+  margin-right: 20rpx;
+}
+.name{
+  margin-left: 30rpx;
+}
+/* .time{
+
+} */

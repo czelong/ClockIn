@@ -1,0 +1,31 @@
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+  <view slot="backText">返回</view>
+  <view slot="content">打卡记录</view>
+</cu-custom>
+<view class="cu-timeline" wx:for="{{records}}" wx:key="index">
+  <view class="cu-time">{{item.date}}</view>
+  <view class="cu-item text-green cuIcon-roundcheck">
+    <view class="content bg-green">
+      <text>{{item.intime}}</text>  签到成功
+    </view>
+  </view>
+  <view class="cu-item text-blue cuIcon-roundcheckfill" wx:if="{{item.outtime != null}}">
+    <view class="bg-cyan content">
+      <text>{{item.outtime}}</text>  签退成功,本次学习时长{{item.time}}
+    </view>
+  </view>
+  <view class="cu-item text-blue cuIcon-loading" wx:if="{{item.outtime == null}}">
+    <view class="bg-blue content">
+      <text></text>  未签退,当前已学习{{item.time}}
+    </view>
+  </view>
+</view>
+
+<view wx:if="{{records.length == 0}}" class="text-xxl" style="margin-top:250rpx;">
+  <view class="flex justify-center">
+    <image src="../../../images/none.png" style="width:300rpx;height:300rpx;"></image>
+  </view>
+  <view class="flex justify-center text-xl">
+    <text>这里什么都没有空空如也哦</text>
+  </view>
+</view>

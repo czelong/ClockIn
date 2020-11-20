@@ -1,0 +1,9 @@
+<cu-custom bgColor="bg-gradual-blue">
+  <view slot="content">打卡</view>
+</cu-custom>
+<view>
+  <image class="img" src="../../../images/qiandao.png" bindtap="clockIn" wx:if="{{clockflag == 0}}"></image>
+</view>
+<view>
+  <image class="img" src="../../../images/qiantui.png" bindtap="clockOut" wx:if="{{clockflag ==1}}"></image>
+</view>

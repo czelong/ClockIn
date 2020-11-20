@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>打卡记录</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-card">
+				<div class="layui-card-header">打卡记录</div>
+				<div class="layui-card-body">	
+					<table id="record-table" lay-filter="record-table"></table>
+				</div>
+			</div>
+		</div>
+		
+		<script src="../../layuiadmin/layui/layui.js"></script>
+		<script>
+			layui.config({
+				base:'../../layuiadmin/'
+			}).extend({
+				index:'lib/index' //主入口模块
+			}).use(['index','table','useradmin','admin','form','layer'],function(){
+				var $ = layui.$
+				,form = layui.form
+				,table = layui.table
+				,admin = layui.admin;
+				
+				//判断登录状态
+				var adminstate = layui.sessionData("adminstate");
+				if(adminstate.logstate!=1){
+					layer.msg('账号未登录',{
+						offset:'15px',
+						icon:2,
+						time:10
+					},function(){
+						top.location.href = '../user/login.html';
+					});
+				};
+				
+				
+				//表格渲染
+				table.render({
+				  elem: '#record-table'
+					,url:layui.setter.Configure+'/record/getRecords'
+					,cellMinWidth: 200
+					,title:'成员表'
+				  ,cols: [[
+						{field:'name', title: '姓名',align:'center'}
+						,{field:'intime', title: '签到时间',align:'center',
+							templet:function(d){
+								var intime = layui.util.toDateString(d.intime/1);
+								return intime;
+							}}
+						,{field:'outtime', title: '签退时间',align:'center',
+							templet:function(d){
+								if(d.outtime != null){
+									var outtime = layui.util.toDateString(d.outtime/1);
+									return outtime;
+								}else{
+									return '未签退';
+								}
+							}}
+						,{field:'time', title: '本次时长',align:'center',
+							templet:function(d){
+								if(d.time != null){
+									var hours = Math.floor(d.time/(3600*1000));//计算出小时数
+									var leave = d.time%(3600*1000);
+									var minutes = Math.floor(leave/(60*1000));//计算出分钟数
+									if(hours >= 1){
+										return hours+'小时'+minutes+'分钟';
+									}else{
+										return minutes+'分钟';
+									}
+								}else{
+									return "未签退";
+								}
+							}
+						}
+						,{title:'操作',align:'center', fixed: 'right', toolbar: '#record-table-operate'}
+				  ]]
+				  ,page: true
+				  ,height: 'full-220'
+				});
+				
+				table.on('tool(record-table)', function(obj){
+					var data = obj.data;
+					if(obj.event === 'del'){
+						layer.confirm('确定删除吗', function(index){
+							admin.req({
+								type:"DELETE",
+								url:layui.setter.Configure+"/record/deleteRecordById",
+								data:{
+									"id":data.id
+								},
+								dataType:"json",
+								success(res){
+									if(res.code == 0){
+										layer.msg('删除成功', {icon: 1,time:1000});
+										layer.close(index);
+										table.reload('record-table',{
+										  page:{
+												curr: $(".layui-laypage-em").next().html() //当前页码值,
+											}
+										});
+									}
+									else if(res.code == 1){
+										layer.msg('删除失败，请重试', {icon: 5,time:3000});
+									}
+								}
+							})
+							return false;
+						});
+					}else if(obj.event === 'out'){
+						var outtime = (new Date()).getTime();
+						console.log(outtime);
+						layer.confirm('确定签退吗', function(index){
+							admin.req({
+								type:"POST",
+								url:layui.setter.Configure+"/record/updateRecord",
+								data:{
+									"id":data.id,
+									"outtime":outtime,
+									"intime":data.intime
+								},
+								dataType:"json",
+								success(res){
+									if(res.code == 0){
+										layer.msg('签退成功', {icon: 1,time:1000});
+										layer.close(index);
+										table.reload('record-table',{
+										  page:{
+												curr: $(".layui-laypage-em").next().html() //当前页码值,
+											}
+										});
+									}
+									else if(res.code == 1){
+										layer.msg('签退失败，请重试', {icon: 5,time:3000});
+									}
+								}
+							})
+							return false;
+						});
+					}
+				});
+				
+			})
+		</script>
+		
+		<script type="text/html" id="record-table-operate">
+			{{# if(d.outtime == null){ }}
+			    <button class="layui-btn layui-btn-normal layui-btn-xs" lay-event="out">签退</button>
+			{{# } else { }}
+			    <button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</button>
+			{{# } }}
+		</script>
+	</body>
+</html>

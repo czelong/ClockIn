@@ -1,0 +1,32 @@
+.form{
+  margin-top: 30rpx;
+}
+.form-item{
+  margin-top:30rpx;
+}
+.item-input{
+  margin-top: 30rpx;
+}
+.btn{
+  margin-top: 60rpx;
+}
+.cb{
+  transform: scale(0.7,0.7);
+}
+
+.card{
+  width: 700rpx;
+  height: 650rpx;
+  margin-left: 25rpx;
+  margin-right: 25rpx;
+  margin-top: 200rpx;
+  border-radius:15rpx;
+  padding-top: 40rpx;
+}
+.Cur{
+  border-bottom: 8rpx solid #f37b1d;
+}
+.text{
+  margin-top: 150rpx;
+  margin-left: 30rpx;
+}

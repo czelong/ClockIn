@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>成员管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-card">
+				<div class="layui-card-header">成员管理</div>
+				<div class="layui-card-body">	
+					<div  class="member-table-reload-btn layui-form" style="margin-bottom: 10px;">						
+						<div class="layui-inline layui-input-block">
+							<select name="state" lay-filter="state" id="reload-state">
+								<option value="">请选择状态</option>
+								<option value="-1">未认证</option>
+								<option value="0">待审核</option>
+								<option value="1">已认证</option>
+							</select>
+						</div>
+						<button class="layui-btn" data-type="reload">搜索</button>
+					</div>
+					<table id="member-table" lay-filter="member-table"></table>
+				</div>
+			</div>
+		</div>
+		
+		<script src="../../layuiadmin/layui/layui.js"></script>
+		<script>
+			layui.config({
+				base:'../../layuiadmin/'
+			}).extend({
+				index:'lib/index' //主入口模块
+			}).use(['index','table','useradmin','admin','form','layer'],function(){
+				var $ = layui.$
+				,form = layui.form
+				,table = layui.table
+				,admin = layui.admin;
+				
+				//判断登录状态
+				var adminstate = layui.sessionData("adminstate");
+				if(adminstate.logstate!=1){
+					layer.msg('账号未登录',{
+						offset:'15px',
+						icon:2,
+						time:10
+					},function(){
+						top.location.href = '../user/login.html';
+					});
+				};
+				
+				
+				//表格渲染
+				table.render({
+				  elem: '#member-table'
+					,url:layui.setter.Configure+'/member/getMembers'
+					,cellMinWidth: 300
+					,title:'成员表'
+				  ,cols: [[
+						{field:'name', title: '姓名',align:'center'}
+						,{field:'state', title: '认证状态',align:'center',templet:'#memberstate'}
+						,{title:'操作',align:'center', fixed: 'right', toolbar: '#member-table-operate'}
+				  ]]
+				  ,page: true
+				  ,height: 'full-220'
+				});
+				
+				
+				table.on('tool(member-table)', function(obj){
+					var data = obj.data;
+					//通过
+					if(obj.event === 'pass'){
+						layer.confirm('是否确定？',{icon:'3'},function(index){
+							admin.req({
+								type:"POST",
+								url:layui.setter.Configure+"/member/updateMemberState",
+								data:{
+									openid:data.openid,
+									state:1
+								},
+								dataType:'json',
+								success(res){
+									if(res.code == 0){
+										layer.msg('修改成功', {icon: 1,time: 500});
+										table.reload('member-table',{page:{curr:$(".layui-laypage-em").next().html()}});
+										layer.close(index);
+									}else{
+										layer.msg(res.msg, {icon: 5,time: 1000});
+									}
+								}
+							})
+						})
+					} else if(obj.event === 'refuse'){ //拒绝
+						layer.confirm('是否确定？',{icon:'3'},function(index){
+							admin.req({
+								type:"DELETE",
+								url:layui.setter.Configure+"/member/deleteMember",
+								data:{
+									openid:data.openid
+								},
+								dataType:'json',
+								success(res){
+									if(res.code == 0){
+										layer.msg('修改成功', {icon: 1,time: 500});
+										table.reload('member-table',{page:{curr:$(".layui-laypage-em").next().html()}});
+										layer.close(index);
+									}else{
+										layer.msg(res.msg, {icon: 5,time: 1000});
+									}
+								}
+							})
+						})
+					} else if(obj.event === 'delete'){//删除
+						layer.confirm('是否确定？',{icon:'3'},function(index){
+							admin.req({
+								type:"DELETE",
+								url:layui.setter.Configure+"/member/deleteMember",
+								data:{
+									openid:data.openid
+								},
+								dataType:'json',
+								success(res){
+									if(res.code == 0){
+										layer.msg('删除成功', {icon: 1,time: 500});
+										table.reload('member-table',{page:{curr:$(".layui-laypage-em").next().html()}});
+										layer.close(index);
+									}else{
+										layer.msg(res.msg, {icon: 5,time: 1000});
+									}
+								}
+							})
+						})
+					} else if(obj.event === 'record'){//查看打卡历史
+						layer.open({
+						  title:'打卡记录',
+						  type: 2,
+						  //skin: 'layui-layer-rim',
+						  shadeClose: false,
+						  area:['80%', '90%'],
+						  content: 'memberRecord.html',
+							success:function(layero,index){
+								//获取子页面的iframe
+								var iframe = window['layui-layer-iframe'+index];
+								//向子页面的全局参数child传参
+								iframe.child(data);
+							}
+						});
+					}
+				});
+				
+				$('.member-table-reload-btn .layui-btn').on('click', function(){
+				  var type = $(this).data('type');
+				  active[type] ? active[type].call(this) : '';
+				});
+				
+			})
+		</script>
+		
+		<script type="text/html" id="memberstate">
+		  {{# if(d.state == 0){ }}
+		      <button class="layui-btn layui-btn-danger layui-btn-xs">待审核</button>
+		  {{# } else if(d.state == 1) { }}
+		      <button class="layui-btn layui-btn-xs">已认证</button>
+		  {{# } }}
+		</script>
+		
+		<script type="text/html" id="member-table-operate">
+			{{# if(d.state == 1){ }}
+			    <button class="layui-btn layui-btn-xs" lay-event="record">查看打卡记录</button>
+					<button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</button>
+			{{# } else if(d.state == 0) { }}
+			    <button class="layui-btn layui-btn-xs" lay-event="pass">通过</button>
+			    <button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="refuse">拒绝</button>
+			{{# } }}
+		</script>
+	</body>
+</html>

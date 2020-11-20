@@ -1,0 +1,15 @@
+<cu-custom bgColor="bg-gradual-blue" isBack="{{true}}">
+  <view slot="backText">返回</view>
+  <view slot="content">上周排名</view>
+</cu-custom>
+<view class="img-view">
+  <image class="img" src="{{ranks[0].portrait}}" mode="scaleToFill"></image>
+</view>
+<view class="ranks">
+  <view class="rank solid-bottom" wx:for="{{ranks}}" wx:key="index">
+    <text class="num text-lg">{{index+1}}</text>
+    <view class="cu-avatar round portrait" style="background-image:url({{item.portrait}});"></view>
+    <text class="name text-lg {{index<=2?'text-red':''}}">{{item.name}}</text>
+    <text class="time fr text-xl {{item.flag==1?'text-orange':'text-green'}}">{{item.time}}</text>
+  </view>
+</view>

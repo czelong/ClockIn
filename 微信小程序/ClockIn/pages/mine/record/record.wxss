@@ -1,0 +1,4 @@
+/* pages/mine/record/record.wxss */
+Page{
+  background-color: white;
+}

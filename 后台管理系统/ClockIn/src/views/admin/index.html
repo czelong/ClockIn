@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>账号管理</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+		<link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+		<link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+	</head>
+	<body>
+		<div class="layui-fluid">
+			<div class="layui-card">
+				<div class="layui-card-header">账号管理</div>
+				<div class="layui-card-body">
+					<div  class="admin-table-reload-btn" style="margin-bottom: 10px;">
+						<button type="button" class="layui-btn layui-btn-normal" data-type="addAdmin" id="add-admin">添加账号</button>
+					</div>
+						
+					<table id="admin-table" lay-filter="admin-table"></table>
+						
+					<script type="text/html" id="admin-table-operate">
+					    <a class="layui-btn  layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+					    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="reset"><i class="layui-icon"></i>重置密码</a>
+					    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+					</script>
+					
+				</div>
+			</div>
+		</div>
+		
+		<script src="../../layuiadmin/layui/layui.js"></script>
+		<script>
+			layui.config({
+				base:'../../layuiadmin/'
+			}).extend({
+				index:'lib/index' //主入口模块
+			}).use(['index','table','useradmin','admin','form','layer'],function(){
+				var $ = layui.$
+				,form = layui.form
+				,table = layui.table
+				,admin = layui.admin;
+				
+				//判断登录状态
+				var adminstate = layui.sessionData("adminstate");
+				if(adminstate.logstate!=1){
+					layer.msg('账号未登录',{
+						offset:'15px',
+						icon:2,
+						time:10
+					},function(){
+						top.location.href = '../user/login.html';
+					});
+				};
+				
+				//方法级渲染
+				table.render({
+				  elem: '#admin-table'
+					,url:layui.setter.Configure+'/admin/getAdmins'
+					,cellMinWidth: 100
+					,title:'账号表'
+				  ,cols: [[
+						{field:'name', title: '姓名',align:'center'}
+						,{field:'account', title: '账号',align:'center'}
+						,{title:'操作',align:'center', fixed: 'right', toolbar: '#admin-table-operate',width:300}
+				  ]]
+				  ,page: true
+				  ,height: 'full-220'
+				});
+				
+				table.on('tool(admin-table)', function(obj){
+					var data = obj.data;
+					if(obj.event === 'del'){
+						layer.confirm('确定删除？',{icon:2,title:'删除'}, function(index){
+							if(adminstate.id == obj.data.id){
+								layer.msg('此账号为当前登录账号，无法删除！', {icon: 5,time: 1000});
+							}
+							else{
+								//删除，向服务器发送请求
+								admin.req({
+									type:"DELETE",
+									url:layui.setter.Configure+"/admin/deleteAdmin",
+									data:{
+										"id":data.id
+									},
+									dataType:"json",
+									async:true,
+									cache:false,
+									timeout:5000,
+									success:function(res){
+										if(res.code == 0){
+											layer.msg('删除成功', {icon: 1,time: 500});
+											table.reload('admin-table',{page:{curr:1}});
+											layer.close(index);
+										}else{
+											layer.msg(res.msg, {icon: 5,time: 1000});
+										}
+									}
+								})
+							}
+							return false;
+						});
+					} else if(obj.event === 'edit'){
+						// layer.alert('编辑行：<br>'+ JSON.stringify(data));
+						layer.open({
+						  type:2,
+						  title:"编辑账号信息",
+						  shadeClose: false,
+						  area:['40%', '70%'],
+						  content: 'updateuser.html',
+							success:function(layero,index){
+								//获取子页面的iframe
+								var iframe = window['layui-layer-iframe'+index];
+								//向子页面的全局参数child传参
+								iframe.child(data);
+							}
+						});
+					} else if(obj.event === 'reset'){
+						layer.confirm('确定重置密码吗？', {
+						  btn: ['确定','取消'] //按钮
+						}, function(index){
+							//重置密码,向服务器发送请求
+							admin.req({
+								type:"POST",
+								url:layui.setter.Configure+"/resetPassword",
+								data:{
+									"userid":data.userid
+								},
+								dataType:"json",
+								async:true,
+								cache:false,
+								timeout:5000,
+								success:function(res){
+									if(res.code == 0){
+										layer.msg('重置成功,当前密码为000000', {icon: 1,time: 3000});
+										layer.close(index);
+									}else{
+										layer.msg('重置失败，请重试',{icon:2,time:1000});
+									}
+								}
+							})
+							return false;
+						})
+					}
+				});
+				
+				var active= {
+					addUser:function(){
+						layer.open({
+						  title:'新增账号',
+						  type: 2,
+						  //skin: 'layui-layer-rim',
+						  shadeClose: false,
+						  area:['40%', '70%'],
+						  content: 'addadmin.html'
+						});
+					}
+				};
+				
+				$('.admin-table-reload-btn .layui-btn').on('click', function(){
+				  var type = $(this).data('type');
+				  active[type] ? active[type].call(this) : '';
+				});
+				
+			})
+		</script>
+	</body>
+</html>

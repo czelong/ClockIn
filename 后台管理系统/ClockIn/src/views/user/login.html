@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>IOT</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="../../layuiadmin/layui/css/layui.css" media="all">
+  <link rel="stylesheet" href="../../layuiadmin/style/admin.css" media="all">
+  <link rel="stylesheet" href="../../layuiadmin/style/login.css" media="all">
+</head>
+<body>
+
+  <div class="layadmin-user-login layadmin-user-display-show layui-bg-cyan" id="LAY-user-login" style="display: none;">
+
+    <div class="layadmin-user-login-main layui-bg-white">
+      <div class="layadmin-user-login-box layadmin-user-login-header">
+        <h2>物联网实验室</h2>
+      </div>
+      <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-username" for="LAY-user-login-username"></label>
+          <input type="text" name="account" id="LAY-user-login-username" lay-verify="required" placeholder="账号" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+          <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+          <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../layuiadmin/layui/layui.js"></script>  
+  <script>
+  layui.config({
+    base: '../../layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+  }).use(['index', 'user','layer'], function(){
+    var $ = layui.$
+    ,setter = layui.setter
+    ,admin = layui.admin
+    ,form = layui.form
+    ,router = layui.router()
+    ,search = router.search
+		,layer = layui.layer;
+
+    form.render();
+
+    //提交
+    form.on('submit(LAY-user-login-submit)', function(obj){
+    
+      //请求登入接口
+      admin.req({
+				url:layui.setter.Configure+'/admin/login',
+				type:"GET",
+        data:{
+					"account":obj.field.account,
+					"password":obj.field.password
+				},
+				success:function(res){
+					//登陆失败
+					if(res.code==1){
+						layer.msg('账号或密码错误',{
+							offset:'15px',
+							icon:5,
+							time:2000
+						})
+					}
+					
+					if(res.code==0){
+						
+						//将登录状态改为1
+						layui.sessionData('adminstate',{
+							key:'logstate',
+							value:1
+						});
+						//写入帐号昵称
+						layui.sessionData('adminstate',{
+							key:'name',
+							value:res.data.name
+						});
+						//写入帐号id
+						layui.sessionData('adminstate',{
+							key:'id',
+							value:res.data.id
+						});
+						
+						//请求成功后，写入 token
+						// layui.data('token',{
+						//     key:'token'
+						//     ,value:res.data.token
+						// });
+						
+						// layui.data(setter.tableName,{
+						//     // key: setter.request.tokenName,
+						// 		key: "token",
+						//     value: res.data.token
+						// });
+						// console.log(res.data.token);
+						
+						//登录成功的提示与跳转
+						layer.msg('登录成功',{
+							offset:'15px',
+							icon:1,
+							time:1000
+						},function(){
+							location.href = '../../../index.html';
+						});
+					}
+				}
+      });
+      
+    });
+    
+  });
+  </script>
+</body>
+</html>

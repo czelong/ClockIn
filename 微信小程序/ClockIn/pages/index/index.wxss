@@ -1,0 +1,6 @@
+.img{
+  width: 400rpx;
+  height: 400rpx;
+  margin-left: 175rpx;
+  margin-top: 400rpx;
+}
